@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Socket IO Chat</title>
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css ">
+	<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+	<style type="text/css">
+		body{
+			margin-top: 20px;
+		}
+		/* This hides the entire chat interface so we can show the username form by itself initially. */
+		#messageArea{
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div id="userFormArea" class="row">
+			<div class="col-md-12">
+				<form id="userForm">
+					<div class="form-group">
+						<label>Enter Username</label>
+						<input class="form-control" id="username"></textarea>
+						<br>
+						<input type="submit" class="btn btn-primary" value="Login">
+					</div>
+				</form>
+			</div>
+		</div>
+		<div id="messageArea" class="row">
+			<div class="col-md-4">
+				<div class="well">
+					<h3>Online Users</h3>
+					<ul class="list group" id="users">
+						
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-8">
+				<div class="chat" id="chat"></div>
+				<form id="messageForm">
+					<div class="form-group">
+						<label>Enter Message</label>
+						<textarea class="form-control" id="message"></textarea>
+						<br>
+						<input type="submit" class="btn btn-primary" value="Send Message">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			var socket = io.connect();
+			var $messageForm = $('#messageForm');
+			var $message = $('#message');
+			var $chat = $('#chat');
+			var $messageArea = $('#messageArea');
+			var $userFormArea = $('#userFormArea');
+			var $userForm = $('#userForm');
+			var $users = $('#users');
+			var $username = $('#username');
+
+			// Create event for when messageForm is submitted.
+			$messageForm.submit(function(e){
+				e.preventDefault();
+				// console.log('Submitted');
+				// Send message data from the textarea. In server.js, upon sending message, it will emit a new message & send that back to client.
+				socket.emit('send message', $message.val());
+				// Clear the message variable
+				$message.val('');
+			});
+
+			socket.on('new message', function(data){
+				$chat.append('<div class="well"><strong>' +data.user+ ':</strong> ' +data.msg+ '</div>');
+			});
+
+			// Submission of user form
+			$userForm.submit(function(e){
+				e.preventDefault();
+				// third argument is function that test for data, then hides userform & displays messageform.
+				socket.emit('new user', $username.val(), function(data){
+					if(data){
+						$userFormArea.hide();
+						$messageArea.show();
+					};
+				});
+				// Clear the message variable
+				$username.val('');
+			});
+
+			// Parses 'get users' in html
+			socket.on('get users', function(data){
+				var html = "";
+				for(i=0; i < data.length; i++){
+					html += '<li class="list-group-item">' +data[i]+ '</li>';
+				};
+				$users.html(html);
+			});
+		});
+	</script>
+</body>
+</html>
