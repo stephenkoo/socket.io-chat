@@ -22,6 +22,8 @@ io.sockets.on('connection', function(socket){
 
 	// Send message
 	socket.on('send message', function(data){
+		// Testing if data sent from textarea is received in this function.
+		console.log(data);
 		// Currently, this will just emit data. When we implement usernames, make this include username as well.
 		io.sockets.emit('new message', { msg: data });
 	});

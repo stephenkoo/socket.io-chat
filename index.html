@@ -46,8 +46,15 @@
 			// Create event for when messageForm is submitted.
 			$messageForm.submit(function(e){
 				e.preventDefault();
-				console.log('Submitted');
+				// console.log('Submitted');
+				// Send message data from the textarea. In server.js, upon sending message, it will emit a new message & send that back to client.
+				socket.emit('send message', $message.val());
+				// Clear the message variable
+				$message.val('');
+			});
 
+			socket.on('new message', function(data){
+				$chat.append('<div class="well">' +data.msg+ '</div>');
 			});
 		});
 	</script>
