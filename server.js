@@ -15,8 +15,16 @@ io.sockets.on('connection', function(socket){
 	console.log('Connected: %s sockets connected.', connections.length); // Number of sockets connected
 
 	// Disconnect
-	connections.splice(connections.indexOf(socket), 1);
-	console.log('Disconnnected: %s sockets connected', connections.length); // Number of remaining sockets connected
+	socket.on('disconnect', function(data){
+		connections.splice(connections.indexOf(socket), 1);
+		console.log('Disconnnected: %s sockets connected', connections.length); // Number of remaining sockets connected
+	});
+
+	// Send message
+	socket.on('send message', function(data){
+		// Currently, this will just emit data. When we implement usernames, make this include username as well.
+		io.sockets.emit('new message', { msg: data });
+	});
 });
 
 server.listen(process.env.PORT || 3000);

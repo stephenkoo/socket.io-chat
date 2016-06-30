@@ -36,5 +36,20 @@
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript">
+		$(function(){
+			var socket = io.connect();
+			var $messageForm = $('#messageForm');
+			var $message = $('#message');
+			var $chat = $('#chat');
+
+			// Create event for when messageForm is submitted.
+			$messageForm.submit(function(e){
+				e.preventDefault();
+				console.log('Submitted');
+
+			});
+		});
+	</script>
 </body>
 </html>
